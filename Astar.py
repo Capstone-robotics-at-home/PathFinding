@@ -1,7 +1,6 @@
 import math
-import env
 import heapq
-import plotting
+from Path_Utils import env, plotting
 
  
 class Astar:
@@ -139,10 +138,10 @@ class Astar:
 if __name__ == '__main__':
     s_start = (5, 5)
     s_goal = (45, 25)
-    obstacle = [(20,5),(30,3),(25,17),(25,13)]
-    astar = Astar(s_start, s_goal, obstacle, 'line')
+    obstacle = [(20,5),(30,3),(25,17),(25,13),(40,25)]
+    astar = Astar(s_start, s_goal, obstacle)
     path, visited = astar.searching()
-    plot = plotting.Plotting(s_start, s_goal, obstacle)
 
+    plot = plotting.Plotting(s_start, s_goal, obstacle)
     plot.animation(path,visited,'AStar')
     # print(path[::-1])

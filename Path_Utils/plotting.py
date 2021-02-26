@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt 
-import env 
+from Path_Utils import env 
 
 class Plotting:
     def __init__(self,xI,xG,obs):
