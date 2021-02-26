@@ -2,21 +2,21 @@ import matplotlib.pyplot as plt
 import env 
 
 class Plotting:
-    def __init__(self,xI,xG):
+    def __init__(self,xI,xG,obs):
         """ 
         xI: start point
         xG: end point 
         """
         self.xI, self.xG = xI, xG 
-        self.env = env.Env() 
-        self.obs = self.env.obs_map() 
+        self.env = env.Env(obs) 
+        self.obs = self.env.obs_map_mod(obs) if not obs == [] else self.env.obs_map()
     
     def update_obs(self, obs): 
         self.obs = obs 
 
     def animation(self,path, visited,name):
         self.plot_grid(name)
-        self.plot_visited(visited)
+        # self.plot_visited(visited)
         self.plot_path(path) 
         plt.show() 
 

@@ -8,11 +8,11 @@ class Astar:
     '''Astar set the cost + heuristics as the priority 
     '''
 
-    def __init__(self, s_start, s_goal, heuristic_type):
+    def __init__(self, s_start, s_goal, obs = [], heuristic_type = 'manhattan'):
         self.s_start = s_start
         self.s_goal = s_goal
         self.heuristic_type = heuristic_type
-        self.Env = env.Env()  # class env
+        self.Env = env.Env() if obs == [] else env.Env(obs) # class env
         self.u_set = self.Env.motions
         self.obs = self.Env.obs
 
@@ -138,9 +138,11 @@ class Astar:
 
 if __name__ == '__main__':
     s_start = (5, 5)
-    s_goal = (45, 5)
-    astar = Astar(s_start, s_goal, 'manhattan')
-    plot = plotting.Plotting(s_start, s_goal)
+    s_goal = (45, 25)
+    obstacle = [(20,5),(30,3),(25,17),(25,13)]
+    astar = Astar(s_start, s_goal, obstacle, 'line')
     path, visited = astar.searching()
+    plot = plotting.Plotting(s_start, s_goal, obstacle)
 
     plot.animation(path,visited,'AStar')
+    # print(path[::-1])
