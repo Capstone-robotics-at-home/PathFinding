@@ -11,7 +11,7 @@ class Plotting:
         """
         self.xI, self.xG = xI, xG 
         self.env = env.Env(obs) 
-        self.obs = self.env.obs_map()
+        self.obs = self.env.obs_map_mod(obs)
     
     def update_obs(self, obs): 
         self.obs = obs 
