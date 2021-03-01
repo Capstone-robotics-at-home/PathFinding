@@ -1,13 +1,11 @@
 class Env:
-    def __init__(self, obstacles = []):
+    def __init__(self, obstacles):
         self.x_range = 51  # size of the background 
         self.y_range = 31 
         self.motions = [(-1,0),(-1,1),(0,1),(1,1),
                         (1,0),(1,-1),(0,-1),(-1,-1)]
-        if obstacles == []:
-            self.obs = self.obs_map()
-        else: 
-            self.obs = self.obs_map_mod(obstacles)
+
+        self.obs = self.obs_map_mod(obstacles)
 
     def update_obs(self, obs):
         self.obs = obs
@@ -15,15 +13,15 @@ class Env:
     def obs_map_mod(self, obs_ls):
         ''' modify the map by the detected obstacles
         :return: map of obstacles  '''
+
+        # the input style: [[(623, 165), 546, 700, 288, 42]]
         if obs_ls == []:
             raise ValueError('Obstacle list is empty')
         obs = set() 
-        Size = [4,4]  # the size of the 'box' of obstacle, [row, column]
-        Row, Column = Size[0], Size[1] 
         for o in obs_ls:
-            ox, oy = o[0], o[1] 
-            for x in range(ox -Row, ox + Row):
-                for y in range(oy - Column, oy + Column):
+            left, right, top, bottom = o[-4:]  # the 4 parameters of the obstacle 'box'
+            for x in range(left, right+1):
+                for y in range(bottom, top+1):
                     obs.add((x,y))
 
         return obs 

@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt 
 from Path_Utils import env 
+from PIL import ImageDraw
+
 
 class Plotting:
     def __init__(self,xI,xG,obs):
@@ -9,7 +11,7 @@ class Plotting:
         """
         self.xI, self.xG = xI, xG 
         self.env = env.Env(obs) 
-        self.obs = self.env.obs_map_mod(obs) if not obs == [] else self.env.obs_map()
+        self.obs = self.env.obs_map()
     
     def update_obs(self, obs): 
         self.obs = obs 
@@ -68,6 +70,19 @@ class Plotting:
         plt.plot(self.xG[0], self.xG[1], 'gs')
 
         plt.pause(0.1)
+
+    def plot_image_path(self, img, path):
+        ''' draw the path on the image 
+        return: painted image '''
+        start = path[-1] 
+        end = path[0] 
+        draw = ImageDraw.Draw(img) 
+        draw.line(path,fill = (255,0,0),width= 20)
+        del draw
+
+        return img 
+
+
 
     @staticmethod
     def color_list():
