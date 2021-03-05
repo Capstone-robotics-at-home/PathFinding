@@ -20,6 +20,8 @@ class Astar:
         self.PARENT = dict()  # the recorded parent
         self.g = dict()  # cost to come
 
+
+
     def searching(self):
         """ 
         A* searching 
@@ -138,7 +140,7 @@ class Astar:
 if __name__ == '__main__':
 
     objects = {'Jetbot': [(953, 461), 834, 1073, 636, 287], 
-        'Obstacle': [(1100, 300), 1000,1200,400,200], 
+        'Obstacle': [(1100, 300), 1000,1200,800,0], 
         'Target': [(1342, 170), 1308, 1377, 249, 92], 
         'Grabber': [(1054, 626), 1003, 1106, 728, 525]}
     obstacle_ls = objects['Obstacle']
@@ -152,3 +154,4 @@ if __name__ == '__main__':
 
     plot = plotting.Plotting(s_start, s_goal, obstacle_ls)
     plot.animation(path,visited,'AStar')
+
