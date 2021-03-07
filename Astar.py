@@ -37,7 +37,8 @@ class Astar:
             _, s = heapq.heappop(self.OPEN)
             self.ClOSED.append(s)
 
-            if s == self.s_goal:
+            if abs(s[0] - self.s_goal[0]) + abs(s[1] - self.s_goal[1]) < 2:
+                end_point = s 
                 break  # stop condition
 
             for s_n in self.get_neighbor(s):
@@ -53,14 +54,14 @@ class Astar:
                     self.PARENT[s_n] = s
                     heapq.heappush(self.OPEN, (self.f_value(s_n), s_n))
 
-        return self.extract_path(self.PARENT), self.ClOSED
+        return self.extract_path(self.PARENT,end_point), self.ClOSED
 
-    def extract_path(self, PARENT):
+    def extract_path(self, PARENT, end ):
         """ extract the path based on the parent set
         :return: the planning path """
 
-        path = [self.s_goal]
-        s = self.s_goal
+        path = [end]
+        s = end 
 
         while True:
             s = PARENT[s]
