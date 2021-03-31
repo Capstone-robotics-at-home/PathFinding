@@ -18,7 +18,7 @@ LR = 0.02                   # learning rate
 EPSILON = 0.8               # greedy policy
 GAMMA = 0.99                # reward discount
 TARGET_REPLACE_ITER = 50   # target update frequency
-MEMORY_CAPACITY = 2000
+MEMORY_CAPACITY = 200
 
 N_ACTIONS = 3
 N_STATES = 3
@@ -92,42 +92,28 @@ class DQN():
         loss.backward() 
         self.optimizer.step()
 
-        
-
-
-def main():
-    objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
-               'Obstacle': [(758, 292), 693, 823, 388, 180],
-               'Target': [(1070, 199), 1036, 1105, 256, 143],
-               'Grabber': [(174, 591), 141, 207, 660, 523]}
-
+def main(objects):
+    
     obstacle_ls = objects['Obstacle']
     s_start = objects['Jetbot'][0]
     s_goal = objects['Target'][0]
     if type(obstacle_ls[0]) == type(()):  # if there is only one obstacle:
         obstacle_ls = [obstacle_ls]
     env = CartEnv(s_start, s_goal, obstacle_ls) 
-    # env.add_obstacle(objects['Obstacle'])
     dqn = DQN()
 
     plt.ion()
-    ax = plt.gca()  # get current axes 
     
     for i_episode in range(300):
         plt.cla()   
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
-        x = [] 
-        y = [] 
         step = 0 
         while True: 
             step += 1 
             a = dqn.choose_action(s) 
             
-            s_,r,done, info = env.step(a) 
-
-            x.append(s_[0])
-            y.append(s_[1])
+            s_,r,done = env.step(a) 
 
             dqn.store_transition(s,a,r,s_)
 
@@ -135,13 +121,20 @@ def main():
             if dqn.memory_counter > MEMORY_CAPACITY: 
                 dqn.learn() 
                 if done: 
-                    print('EP: {0} | EP_r: {1}'.format(i_episode,round(ep_r,2)))
+                    print('Epsilon: {0} | Reward: {1} | Step: {2}'.format(
+                        i_episode,round(ep_r,2), step))
 
             if step == 1000: 
                 break 
 
             if done: 
                 break 
+
+            # if done or step % MEMORY_CAPACITY == 0: 
+            #     dqn.learn()
+            #     print('Epsilon: {0} | Reward: {1} | Step: {2}'.format(
+            #         i_episode,round(ep_r,2), step))
+            #     break
 
             s = s_
         # print(env.cart.x,env.cart.y,env.cart.theta) # print the result 
@@ -150,4 +143,10 @@ def main():
         plt.pause(0.5)
 
 if __name__ == '__main__':
-    main()
+    objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
+               'Obstacle': [(758, 292), 693, 823, 388, 180],
+            #    'Obstacle': [(0,0), 0,1,0,1],
+               'Target': [(1070, 199), 1036, 1105, 256, 143],
+               'Grabber': [(250, 320), 141, 207, 660, 523]}
+
+    main(objects)
