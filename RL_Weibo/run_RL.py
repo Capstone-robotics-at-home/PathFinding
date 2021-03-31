@@ -96,7 +96,7 @@ class DQN():
 
 
 def main():
-    env = CartEnv(step_time = 0.1) 
+    env = CartEnv(step_time = 0.5) 
     env.add_obstacle([[0.5,0.5],[0.5,1],[1.5,0.5],[1.5,1]])
     dqn = DQN()
 

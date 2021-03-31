@@ -4,7 +4,6 @@
  # @ Description: copied form Weibo 
  '''
 
-from cart_env import cart_ode
 import gym
 from numpy import core
 import polytope as pt
@@ -65,9 +64,10 @@ class CartEnv(gym.Env):
         self.frame = pt.qhull(
             np.array([[-0.5, -0.5], [2, -0.5], [-0.5, 2], [2, 2]]))
         self.step_time = step_time
+
     def update_cart_polytope(self):
         self.cart_poly = pt.qhull(self.cart.corners_posistion().T)
-        
+
     def add_obstacle(self, corners):
         p1 = pt.qhull(np.asarray(corners))
         self.obstacles.append(p1)
@@ -79,6 +79,7 @@ class CartEnv(gym.Env):
             if not np.all(A@point - b <= 0):
                 return False
         return True
+
     def check_frame(self):
         A = self.frame.A
         b = self.frame.b
@@ -103,7 +104,6 @@ class CartEnv(gym.Env):
 
         return True
 
-
     def step(self, action):
         """ 
         action 0: forward
@@ -126,7 +126,8 @@ class CartEnv(gym.Env):
         self.update_cart_polytope()
         done = False
         info = []
-        reward = -0.01  # tuning argument here
+        reward = -0.01
+          # tuning argument here
 
         if self.check_crash() == False:
             done = True
@@ -143,7 +144,6 @@ class CartEnv(gym.Env):
             info.append('reach the goal')
             reward = 1000
         return next_state, reward, done, info
-
 
     def reset(self):
         self.cart.x = 0
