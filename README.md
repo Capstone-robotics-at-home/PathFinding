@@ -12,3 +12,5 @@
 * Run simple_RL_run.py
 * Build A simple RL training environment 
 * waiting for improvement 
+* The next step might be: Use A* algorithm for the first serveral times.
+* What about add the position of the target to the state?

@@ -9,6 +9,7 @@ from Astar import Astar
 from Path_Utils import plotting
 
 
+
 class CartEnv():
     def __init__(self, start, goal, obs):
         self.decider = Decider()
@@ -41,7 +42,7 @@ class CartEnv():
         else:
             print("Action Wrong!")
 
-        next_state = self.decider.visited[-1]
+        next_state = self.decider.visited[-1] + self.count_delta()
         done = False
         next_distance = self.count_distance() 
         delta_distance = current_distance - next_distance  # positive reward means get closer to the target 
@@ -80,7 +81,7 @@ class CartEnv():
     def reset(self, p_start, p_grabber):
         self.decider = Decider()
         self.decider.reinit(p_start, p_grabber)
-        return self.decider.position + [self.decider.heading]
+        return self.decider.position + [self.decider.heading] + self.count_delta()
 
     def check_crash(self):  
         """ check if it crashed into obstacle """
@@ -114,3 +115,9 @@ class CartEnv():
         x, y = self.decider.get_position()
         goal = self.astar.s_goal
         return abs(x - goal[0]) + abs(y - goal[1])
+
+    def count_delta(self):
+        """ Count the relative position to the goal. """
+        x, y = self.decider.get_position()
+        goal = self.astar.s_goal
+        return [goal[0] - x, goal[1] - y]

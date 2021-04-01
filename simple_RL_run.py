@@ -10,18 +10,19 @@ import torch.nn.functional as F
 import numpy as np  
 import matplotlib.pyplot as plt 
 from simple_RL_env import CartEnv 
+from Testing import realtime_search
 
 
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.02                   # learning rate
-EPSILON = 0.8               # greedy policy
-GAMMA = 0.99                # reward discount
+EPSILON = 0.9               # greedy policy
+GAMMA = 0.99               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
 MEMORY_CAPACITY = 200
 
 N_ACTIONS = 3
-N_STATES = 3
+N_STATES = 5
 ENV_A_SHAPE = 0
 
 
@@ -93,7 +94,7 @@ class DQN():
         self.optimizer.step()
 
 def main(objects):
-    
+    plt.ion()
     obstacle_ls = objects['Obstacle']
     s_start = objects['Jetbot'][0]
     s_goal = objects['Target'][0]
@@ -101,8 +102,9 @@ def main(objects):
         obstacle_ls = [obstacle_ls]
     env = CartEnv(s_start, s_goal, obstacle_ls) 
     dqn = DQN()
+    astar_cmds = realtime_search(objects)
 
-    plt.ion()
+    print("--------------------------------Finished initalizing------------------------")
     
     for i_episode in range(300):
         plt.cla()   
@@ -111,33 +113,32 @@ def main(objects):
         step = 0 
         while True: 
             step += 1 
-            a = dqn.choose_action(s) 
-            
+
+            if dqn.memory_counter > MEMORY_CAPACITY: 
+                a = dqn.choose_action(s) 
+            else: 
+                a = astar_cmds[dqn.memory_counter % len(astar_cmds)]  #learn with Astar 
             s_,r,done = env.step(a) 
 
             dqn.store_transition(s,a,r,s_)
 
             ep_r += r 
-            if dqn.memory_counter > MEMORY_CAPACITY: 
-                dqn.learn() 
-                if done: 
-                    print('Epsilon: {0} | Reward: {1} | Step: {2}'.format(
-                        i_episode,round(ep_r,2), step))
-
-            if step == 1000: 
-                break 
-
+            dqn.learn() 
             if done: 
-                break 
+                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3}'.format(
+                    i_episode,round(ep_r,2), step, dqn.memory_counter))
+                break
 
-            # if done or step % MEMORY_CAPACITY == 0: 
-            #     dqn.learn()
-            #     print('Epsilon: {0} | Reward: {1} | Step: {2}'.format(
-            #         i_episode,round(ep_r,2), step))
-            #     break
+            if dqn.memory_counter > 1000:   # clear memory and learn with A* 
+                print('================================Learn from A*================================')   
+                dqn.memory_counter %= 1000 
+                
+            
+            if step > 500: 
+                print("================================Too many steps")
+                break 
 
             s = s_
-        # print(env.cart.x,env.cart.y,env.cart.theta) # print the result 
         
         env.show_plot()
         plt.pause(0.5)
