@@ -16,7 +16,7 @@ from Testing import realtime_search
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.02                   # learning rate
-EPSILON = 0.9               # greedy policy
+EPSILON = 0.92             # greedy policy
 GAMMA = 0.99               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
 MEMORY_CAPACITY = 200
@@ -129,12 +129,13 @@ def main(objects):
                     i_episode,round(ep_r,2), step, dqn.memory_counter))
                 break
 
-            if dqn.memory_counter > 1000:   # clear memory and learn with A* 
+            if dqn.memory_counter >= 1000:   # clear memory and learn with A* 
                 print('================================Learn from A*================================')   
-                dqn.memory_counter %= 1000 
+                dqn.memory_counter =0
+                break 
                 
             
-            if step > 500: 
+            if step > 2 * len(astar_cmds): 
                 print("================================Too many steps")
                 break 
 

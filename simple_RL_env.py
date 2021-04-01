@@ -4,8 +4,8 @@
  # @ Description: A simple Reinforcement Learning Environment for DQN
  '''
 
-from JetbotPy import Decider
-from Astar import Astar
+from Path_Utils.JetbotPy import Decider
+from Path_Utils.Astar import Astar
 from Path_Utils import plotting
 
 
@@ -100,7 +100,7 @@ class CartEnv():
     def check_boundary(self):  
         """ check if it hits the boundary """
         x, y = self.decider.get_position()
-        if x < 0 or x > self.BOUNDS[0] or y < 0 or y > self.BOUNDS[1]:
+        if x < 0 or x > self.BOUNDS[0] or y < -100 or y > self.BOUNDS[1]:
             return True
         else:
             return False

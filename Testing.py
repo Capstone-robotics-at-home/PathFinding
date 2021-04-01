@@ -4,8 +4,8 @@
  # @ Description: Test file for Astar search
  '''
 
-from JetbotPy import Decider
-from Astar import Astar
+from Path_Utils.JetbotPy import Decider
+from Path_Utils.Astar import Astar
 from Path_Utils import plotting
 
 
