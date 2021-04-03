@@ -90,7 +90,7 @@ def realtime_search(objects):
     trajectory = decider.get_trajectory()
     print('Terminate, Total number of movements is: %d' % len(trajectory))
     plot.plot_traj(Original_path, trajectory)
-    return decider.cmd_record
+    return decider.cmd_record, Original_path
 
 
 if __name__ == '__main__':

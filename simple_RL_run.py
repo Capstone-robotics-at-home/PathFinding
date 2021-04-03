@@ -11,15 +11,16 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from simple_RL_env import CartEnv 
 from Testing import realtime_search
+import time 
 
 
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.02                   # learning rate
 EPSILON = 0.92             # greedy policy
-GAMMA = 0.99               # reward discount, the larger, the longer sight. 
+GAMMA = 0.9               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
-MEMORY_CAPACITY = 200
+MEMORY_CAPACITY = 500
 
 N_ACTIONS = 3
 N_STATES = 5
@@ -102,10 +103,10 @@ def main(objects):
         obstacle_ls = [obstacle_ls]
     env = CartEnv(s_start, s_goal, obstacle_ls) 
     dqn = DQN()
-    astar_cmds = realtime_search(objects)
+    astar_cmds,astar_sol = realtime_search(objects)
 
     print("--------------------------------Finished initalizing------------------------")
-    
+    start_time = time.time()
     for i_episode in range(300):
         plt.cla()   
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
@@ -117,7 +118,8 @@ def main(objects):
             if dqn.memory_counter > MEMORY_CAPACITY: 
                 a = dqn.choose_action(s) 
             else: 
-                a = astar_cmds[dqn.memory_counter % len(astar_cmds)]  #learn with Astar 
+                astar_squence = dqn.memory_counter % len(astar_cmds)
+                a = astar_cmds[astar_squence]  #learn with Astar 
             s_,r,done = env.step(a) 
 
             dqn.store_transition(s,a,r,s_)
@@ -125,11 +127,11 @@ def main(objects):
             ep_r += r 
             dqn.learn() 
             if done: 
-                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3}'.format(
-                    i_episode,round(ep_r,2), step, dqn.memory_counter))
+                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
+                    i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
                 break
 
-            if dqn.memory_counter >= 1000:   # clear memory and learn with A* 
+            if dqn.memory_counter >= 1000:   # clear memory and learn with A*       
                 print('================================Learn from A*================================')   
                 dqn.memory_counter =0
                 break 
@@ -137,11 +139,13 @@ def main(objects):
             
             if step > 2 * len(astar_cmds): 
                 print("================================Too many steps")
+                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
+                    i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
                 break 
 
             s = s_
         
-        env.show_plot()
+        env.show_plot(astar_sol)
         plt.pause(0.5)
 
 if __name__ == '__main__':

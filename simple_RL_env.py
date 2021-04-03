@@ -16,13 +16,13 @@ class CartEnv():
         self.decider.reinit(start, goal)
         self.astar = Astar(start, goal, obs)
         self.plot = plotting.Plotting(start, goal, obs)
-        self.astar_sol = self.astar.searching()[0]
+        # self.astar_sol = self.astar.searching()[0]
 
         # self.REWARD_STEP = 0.01
-        self.REWARD_REACH = 100
-        self.REWARD_BOUND = -100
-        self.REWARD_CRASH = -50
-        self.REWARD_DEVIATION = -50
+        self.REWARD_REACH = 20
+        self.REWARD_BOUND = -10
+        self.REWARD_CRASH = -10
+        self.REWARD_DEVIATION = -10
         self.BOUNDS = [1200, 800]
         self.TOTAL_DISTANCE = self.count_distance()  # the Original distance between goal and start 
 
@@ -47,7 +47,7 @@ class CartEnv():
         next_distance = self.count_distance() 
         delta_distance = current_distance - next_distance  # positive reward means get closer to the target 
         # The reward function is an important part.
-        reward = delta_distance / current_distance if action == 0 else 0  # get reward only when it moves forward
+        reward = delta_distance / current_distance   # get reward only when it moves forward
 
         if self.check_crash() == True:
             done = True
@@ -75,8 +75,8 @@ class CartEnv():
 
         return next_state, reward, done
 
-    def show_plot(self):
-        self.plot.plot_traj(self.astar_sol, self.decider.get_trajectory())
+    def show_plot(self,solution):
+        self.plot.plot_traj(solution, self.decider.get_trajectory())
 
     def reset(self, p_start, p_grabber):
         self.decider = Decider()
@@ -92,7 +92,7 @@ class CartEnv():
 
     def check_reach(self):  
         """ check if it reached the goal """
-        if self.count_distance() < self.decider.Horizon * self.decider.StepLen:
+        if self.count_distance() <= self.decider.Horizon * self.decider.StepLen:
             return True
         else:
             return False
@@ -100,7 +100,7 @@ class CartEnv():
     def check_boundary(self):  
         """ check if it hits the boundary """
         x, y = self.decider.get_position()
-        if x < 0 or x > self.BOUNDS[0] or y < -100 or y > self.BOUNDS[1]:
+        if x < 0 or x > self.BOUNDS[0] or y < 0 or y > self.BOUNDS[1]:
             return True
         else:
             return False
