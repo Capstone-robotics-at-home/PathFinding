@@ -19,10 +19,12 @@ class CartEnv():
         # self.astar_sol = self.astar.searching()[0]
 
         # self.REWARD_STEP = 0.01
-        self.REWARD_REACH = 20
+        self.REWARD_REACH = 100
         self.REWARD_BOUND = -10
         self.REWARD_CRASH = -10
         self.REWARD_DEVIATION = -10
+        self.REWARD_MISSING = -10
+        self.MAX_STEPS = 100
         self.BOUNDS = [1200, 800]
         self.TOTAL_DISTANCE = self.count_distance()  # the Original distance between goal and start 
 
@@ -31,6 +33,13 @@ class CartEnv():
         action 0: forward
         action 1: left
         action 2: right
+        return info -> int: 
+            0: Nothing happened
+            1: Reach the goal 
+            2: Go to the boundary
+            3: Crash in the obstacle 
+            4: Deviate from the ideal path
+            5: Too many steps, missing 
         """
         current_distance = self.count_distance() # the current distance between goal and start
         if action == 0:
@@ -48,32 +57,45 @@ class CartEnv():
         delta_distance = current_distance - next_distance  # positive reward means get closer to the target 
         # The reward function is an important part.
         reward = delta_distance / current_distance   # get reward only when it moves forward
-
-        if self.check_crash() == True:
-            done = True
-            print('================================Crashed into Obstacle')
-            reward = self.REWARD_CRASH
-            return next_state, reward, done
+        # reward = 0 
+        info = 0 
 
         if self.check_reach() == True:
             done = True
-            print('================================Reached the Goal================================')
+            print('Reached the Goal')
             reward = self.REWARD_REACH
-            return next_state, reward, done
+            info = 1
+            return next_state, reward, done, info 
 
         if self.check_boundary() == True:
             done = True
-            print('================================Boundary hit')
+            print('Boundary hit')
             reward = self.REWARD_BOUND
-            return next_state, reward, done
+            info = 2
+            return next_state, reward, done, info
+
+        if self.check_crash() == True:
+            done = True
+            print('Crashed into Obstacle')
+            reward = self.REWARD_CRASH
+            info = 3
+            return next_state, reward, done, info 
 
         if self.check_deviation() == True:
             done = True
-            print('================================Deviate from Ideal path')
+            print('Deviate from Ideal path')
             reward = self.REWARD_DEVIATION
-            return next_state, reward, done
+            info = 4
+            return next_state, reward, done, info 
 
-        return next_state, reward, done
+        if len(self.decider.visited) > self.MAX_STEPS:
+            done = True
+            print('Too many steps')
+            reward = self.REWARD_MISSING
+            info = 5
+            return next_state, reward, done, info
+
+        return next_state, reward, done, info 
 
     def show_plot(self,solution):
         self.plot.plot_traj(solution, self.decider.get_trajectory())

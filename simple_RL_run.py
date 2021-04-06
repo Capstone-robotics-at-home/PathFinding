@@ -20,7 +20,7 @@ LR = 0.02                   # learning rate
 EPSILON = 0.92             # greedy policy
 GAMMA = 0.9               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
-MEMORY_CAPACITY = 500
+MEMORY_CAPACITY = 100
 
 N_ACTIONS = 3
 N_STATES = 5
@@ -104,55 +104,82 @@ def main(objects):
     env = CartEnv(s_start, s_goal, obstacle_ls) 
     dqn = DQN()
     astar_cmds,astar_sol = realtime_search(objects)
+    if_astar = True
+    events =np.array([0,0,0,0,0])  # record the events during training: [bound, crash, deviate, reach]
+    events_history = events.copy()
+    episode_events = np.array([0,0,0,0,0]) # record the events during each episode
+    accuracy_history = [0.0] # record the accuracy 
+    N_shown = 100  # show results for N steps
 
     print("--------------------------------Finished initalizing------------------------")
     start_time = time.time()
-    for i_episode in range(300):
+    for i_episode in range(1000):
         plt.cla()   
+
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
         step = 0 
         while True: 
             step += 1 
-
             if dqn.memory_counter > MEMORY_CAPACITY: 
+                if if_astar == True:
+                    if_astar = False  # Learn by itself
                 a = dqn.choose_action(s) 
             else: 
                 astar_squence = dqn.memory_counter % len(astar_cmds)
-                a = astar_cmds[astar_squence]  #learn with Astar 
-            s_,r,done = env.step(a) 
+                a = astar_cmds[astar_squence]  # learn with Astar 
+            s_,r,done,info = env.step(a) 
 
             dqn.store_transition(s,a,r,s_)
 
             ep_r += r 
             dqn.learn() 
             if done: 
-                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
-                    i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
+                events[info-1] += 1 if not if_astar else 0  # update the event records when it runs on its own.
+                if info == 1 and if_astar == False:
+                    print('================================ Good =================================')
+                    print(' Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
+                        i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
                 break
 
-            if dqn.memory_counter >= 1000:   # clear memory and learn with A*       
-                print('================================Learn from A*================================')   
+            if dqn.memory_counter >= 500:   # clear memory and learn with A*       
                 dqn.memory_counter =0
-                break 
-                
-            
-            if step > 2 * len(astar_cmds): 
-                print("================================Too many steps")
-                print('Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
-                    i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
+                if_astar = True  # learn from A* 
                 break 
 
             s = s_
         
-        env.show_plot(astar_sol)
-        plt.pause(0.5)
+        if i_episode % N_shown == 0:
+            # env.show_plot(astar_sol)
+            episode_events = events - events_history
+            events_history = events.copy()
+            accuracy = episode_events[0] / sum(episode_events)
+            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+                episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
+            print('ACCURACY: {0}'.format(accuracy))
+            accuracy_history.append(accuracy)
+            plt.bar([1,2,3,4,5], episode_events)
+            plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+                episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
+            plt.pause(1)
+    # plt.ioff()
+    # plt.show()
+    print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+    episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
+    print('ACCURACY HISTORY: {0}'.format(accuracy_history))
+
 
 if __name__ == '__main__':
-    objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
-               'Obstacle': [(758, 292), 693, 823, 388, 180],
-            #    'Obstacle': [(0,0), 0,1,0,1],
-               'Target': [(1070, 199), 1036, 1105, 256, 143],
-               'Grabber': [(250, 320), 141, 207, 660, 523]}
-
+    # objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
+    #            'Obstacle': [(758, 292), 693, 823, 388, 180],
+    #         #    'Obstacle': [(0,0), 0,1,0,1],
+    #            'Target': [(1070, 199), 1036, 1105, 256, 143],
+    #            'Grabber': [(250, 320), 141, 207, 660, 523]}
+    objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
+                'Obstacle': [(508, 223), 465, 551, 293, 153], 
+                # 'Obstacle': [(0,0), 0,1,0,1],
+                'Target': [(780, 364), 756, 804, 412, 316], 
+                'Grabber': [(214, 191), 186, 242, 232, 150]}
     main(objects)
+
+
