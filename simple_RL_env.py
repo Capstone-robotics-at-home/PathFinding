@@ -56,8 +56,8 @@ class CartEnv():
         next_distance = self.count_distance() 
         delta_distance = current_distance - next_distance  # positive reward means get closer to the target 
         # The reward function is an important part.
-        reward = delta_distance / current_distance   # get reward only when it moves forward
-        # reward = 0 
+        # reward = delta_distance / current_distance   # get reward only when it moves forward
+        reward = 0 
         info = 0 
 
         if self.check_reach() == True:

@@ -5,14 +5,17 @@
 
 # Simple_RL 
 * Run simple_RL_run.py: Build A simple RL training environment
+* Trainning results: 
+![RL_results](RL_results.jpg)
 
 ## Improvement
 * `States:` expand 3 into 5 -> take the relative position to the target into account 
 * `reward function:` The closer to the target, the greater reward each step will get. 
-* `Astar solution:` 'Teach' the Agent with A* solution so that it can have some useful initial settings. 
+* note: I tried to use AStar to teach it but the results seems not to be so good. 
 
 
 # RL_Weibo Folder
 * Run run_RL.py 
 * A RL reinforcement training with Polytope
 * Contributed by Weibo Huang 
+* Reference: MorvanZhou
