@@ -17,8 +17,8 @@ import time
 # Hyper Parameters
 BATCH_SIZE = 32
 LR = 0.02                   # learning rate
-EPSILON = 0.92             # greedy policy
-GAMMA = 0.9               # reward discount, the larger, the longer sight. 
+EPSILON = 0.9              # greedy policy
+GAMMA = 0.99               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
 MEMORY_CAPACITY = 100
 
@@ -30,13 +30,17 @@ ENV_A_SHAPE = 0
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(N_STATES, 50)
+        self.fc1 = nn.Linear(N_STATES, 15)
         self.fc1.weight.data.normal_(0, 0.1)  # initialization
-        self.out = nn.Linear(50, N_ACTIONS) 
+        self.fc2 = nn.Linear(15, 15)
+        self.fc2.weight.data.normal_(0,0.1)
+        self.out = nn.Linear(15, N_ACTIONS) 
         self.out.weight.data.normal_(0,0.1) 
 
     def forward(self, x):
         x = self.fc1(x) 
+        x = F.relu(x)  # activation 
+        x = self.fc2(x) 
         x = F.relu(x)  # activation 
         actions_value = self.out(x) 
         return actions_value
@@ -115,8 +119,6 @@ def main(objects):
     print("--------------------------------Finished initalizing------------------------")
     start_time = time.time()
     for i_episode in range(10000):
-        plt.cla()   
-
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
         step = 0 
@@ -151,8 +153,7 @@ def main(objects):
             print('ACCURACY: {0}'.format(accuracy))
             accuracy_history.append(accuracy)
 
-            # draw results in bars
-            # plt.bar([1,2,3,4,5], episode_events)
+            # show the accuracy results
             plt.plot(accuracy_history[2:])
             plt.ylim((0,1))
             plt.grid(True)
