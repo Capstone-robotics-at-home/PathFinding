@@ -155,19 +155,19 @@ def main(objects):
             print('ACCURACY: {0}'.format(accuracy))
             accuracy_history.append(accuracy)
 
-            # # show the accuracy results
-            # plt.plot(accuracy_history[2:])
-            # plt.ylim((0,1))
-            # plt.grid(True)
-            # plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
-            #     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
+            # show the accuracy results
+            plt.plot(accuracy_history[2:])
+            plt.ylim((0,1))
+            plt.grid(True)
+            plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+                episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
             plt.pause(1)
     plt.ioff()
     plt.plot(accuracy_history[2:])
     plt.ylim((0,1))
     plt.grid(True)
     plt.title('RL_results.jpg')
-    plt.savefig('RL_results_{0}.jpg'.format((round(accuracy_history[-1],2))))
+    # plt.savefig('RL_results_{0}.jpg'.format((round(accuracy_history[-1],2))))
 
     print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
@@ -179,11 +179,6 @@ def main(objects):
 
 
 if __name__ == '__main__':
-    # objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
-    #            'Obstacle': [(758, 292), 693, 823, 388, 180],
-    #         #    'Obstacle': [(0,0), 0,1,0,1],
-    #            'Target': [(1070, 199), 1036, 1105, 256, 143],
-    #            'Grabber': [(250, 320), 141, 207, 660, 523]}
     objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
                 'Obstacle': [(508, 223), 465, 551, 293, 153], 
                 # 'Obstacle': [(0,0), 0,1,0,1],
