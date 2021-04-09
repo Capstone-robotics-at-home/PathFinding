@@ -4,6 +4,7 @@
  # @ Description: A Reinforcement Training program using simple Reinforcement learning environment.
  '''
 
+from math import pi
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,8 +16,9 @@ import time
 
 
 # Hyper Parameters
+N_EPISODES = 3000            # Number of total episodes
 BATCH_SIZE = 32
-LR = 0.02                   # learning rate
+LR = 0.01                   # learning rate
 EPSILON = 0.9              # greedy policy
 GAMMA = 0.99               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
@@ -118,7 +120,7 @@ def main(objects):
 
     print("--------------------------------Finished initalizing------------------------")
     start_time = time.time()
-    for i_episode in range(10000):
+    for i_episode in range(N_EPISODES):
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
         step = 0 
@@ -153,23 +155,24 @@ def main(objects):
             print('ACCURACY: {0}'.format(accuracy))
             accuracy_history.append(accuracy)
 
-            # show the accuracy results
-            plt.plot(accuracy_history[2:])
-            plt.ylim((0,1))
-            plt.grid(True)
-            plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
-                episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
+            # # show the accuracy results
+            # plt.plot(accuracy_history[2:])
+            # plt.ylim((0,1))
+            # plt.grid(True)
+            # plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+            #     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
             plt.pause(1)
     plt.ioff()
-    plt.cla()   
-    plt.figure()
     plt.plot(accuracy_history[2:])
-    plt.autoscale(True)
+    plt.ylim((0,1))
     plt.grid(True)
+    plt.title('RL_results.jpg')
+    plt.savefig('RL_results_{0}.jpg'.format((round(accuracy_history[-1],2))))
 
     print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
     print('ACCURACY HISTORY: {0}'.format(accuracy_history))
+    torch.save(dqn.eval_net, 'DQNnet_{0}.pkl'.format(round(accuracy_history[-1],2)))
     plt.show()
 
 
@@ -187,5 +190,6 @@ if __name__ == '__main__':
                 'Target': [(780, 364), 756, 804, 412, 316], 
                 'Grabber': [(214, 191), 186, 242, 232, 150]}
     main(objects)
+
 
 
