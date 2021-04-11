@@ -4,9 +4,13 @@
  # @ Description: Test file for Astar search
  '''
 
+from matplotlib import pyplot as plt
+from RLmodel_test import DQNnet
+from Path_Utils.simple_RL_env import CartEnv
 from Path_Utils.JetbotPy import Decider
 from Path_Utils.Astar import Astar
 from Path_Utils import plotting
+from Path_Utils.simple_RL_run import Net
 
 
 Ratio = 1 
@@ -51,6 +55,9 @@ def get_obs_set(obstacle_list, margin_size):
 
 
 def realtime_search(objects):
+    """ Path finding with realtime Astar algorithm
+    return command at each step and the original Astar path solution"""
+
     decider = Decider(False)
     # plot the original path
     jetbot_pos, jetbot_size = objects['Jetbot'][0], objects['Jetbot'][-4:]
@@ -93,12 +100,56 @@ def realtime_search(objects):
     return decider.cmd_record, Original_path
 
 
-if __name__ == '__main__':
+def RL_search(objects):
+    """ Path finding methods with Reinforcement Learning 
+    return: the recorded commands to the goal"""   
 
-    objects = {'Jetbot': [(210, 462), 107, 314, 577, 347],
-               'Obstacle': [(758, 292), 693, 823, 388, 180],
-               'Target': [(1070, 199), 1036, 1105, 256, 143],
-               'Grabber': [(174, 591), 141, 207, 660, 523]}
+    # generate env
+    obstacle_ls = objects['Obstacle']
+    s_start = objects['Jetbot'][0]
+    s_goal = objects['Target'][0]
+    if type(obstacle_ls[0]) == type(()):  # if there is only one obstacle:
+        obstacle_ls = [obstacle_ls]
+    env = CartEnv(s_start, s_goal, obstacle_ls) 
+
+    # initialize RL brain
+    dqn = DQNnet('DQNnet.pkl') 
+    info = 0  # initialize info with 0 means nothing happened
+
+    # try until find solution
+    while info is not 1: 
+        s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
+        ep_r = 0 
+        step = 0 
+        # while info is not 1: 
+        while True:
+            step += 1 
+            a = dqn.choose_action(s)                 
+            s_,r,done,info = env.step(a) 
+
+            ep_r += r 
+            if done: 
+                print('Episode information number: ', info)
+                if info == 1:
+                    print('================================ Path Found =================================')
+                    return env.decider.cmd_record
+                break
+            s = s_
+    if info is not 1:
+        print('================================ERROR: path not found================================')
+        return [0]
+    
+    return []
+
+
+if __name__ == '__main__':
+    objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
+                'Obstacle': [(508, 223), 465, 551, 293, 153], 
+                # 'Obstacle': [(0,0), 0,1,0,1],
+                'Target': [(780, 364), 756, 804, 412, 316], 
+                'Grabber': [(214, 191), 186, 242, 232, 150]}
     # objects = {
     #     'Jetbot': [(829, 278), 695, 964, 485, 71], 'Obstacle': [(972, 588), 898, 1047, 718, 458], 'Target': [(1559, 727), 1517, 1602, 819, 636], 'Grabber': [(962, 377), 920, 1004, 447, 308]}
-    realtime_search(objects)
+    # realtime_search(objects)
+    sol = RL_search(objects)
+    print(sol)

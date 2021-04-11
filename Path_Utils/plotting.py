@@ -31,7 +31,7 @@ class Plotting:
         plt.plot(self.xG[0], self.xG[1], 'gs')
         plt.plot(obs_x, obs_y, 'sk')
         plt.title(name)
-        plt.axis('equal')
+        # plt.axis('equal')
 
     def plot_traj(self, ori_path, traj):
         """ plot the original path and the trajectory of the Jetbot

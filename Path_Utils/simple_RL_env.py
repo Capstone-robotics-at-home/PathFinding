@@ -62,35 +62,35 @@ class CartEnv():
 
         if self.check_reach() == True:
             done = True
-            print('Reached the Goal')
+            # print('Reached the Goal')
             reward = self.REWARD_REACH
             info = 1
             return next_state, reward, done, info 
 
         if self.check_boundary() == True:
             done = True
-            print('Boundary hit')
+            # print('Boundary hit')
             reward = self.REWARD_BOUND
             info = 2
             return next_state, reward, done, info
 
         if self.check_crash() == True:
             done = True
-            print('Crashed into Obstacle')
+            # print('Crashed into Obstacle')
             reward = self.REWARD_CRASH
             info = 3
             return next_state, reward, done, info 
 
         if self.check_deviation() == True:
             done = True
-            print('Deviate from Ideal path')
+            # print('Deviate from Ideal path')
             reward = self.REWARD_DEVIATION
             info = 4
             return next_state, reward, done, info 
 
         if len(self.decider.visited) > self.MAX_STEPS:
             done = True
-            print('Too many steps')
+            # print('Too many steps')
             reward = self.REWARD_MISSING
             info = 5
             return next_state, reward, done, info

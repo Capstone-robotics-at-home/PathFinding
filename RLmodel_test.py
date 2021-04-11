@@ -10,12 +10,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np  
 import matplotlib.pyplot as plt 
-from simple_RL_env import CartEnv 
+from Path_Utils.simple_RL_env import CartEnv
+from Path_Utils.simple_RL_run import Net
 import time 
 
 # Hyper Parameters
-N_EPISODES = 1000            # Number of total episodes
-N_SHOWN = 100
+N_EPISODES = 300            # Number of total episodes
+N_SHOWN = 50
 BATCH_SIZE = 32
 EPSILON = 0.9              # greedy policy
 
@@ -23,27 +24,9 @@ N_ACTIONS = 3
 N_STATES = 5
 ENV_A_SHAPE = 0
 
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(N_STATES, 15)
-        self.fc1.weight.data.normal_(0, 0.1)  # initialization
-        self.fc2 = nn.Linear(15, 15)
-        self.fc2.weight.data.normal_(0,0.1)
-        self.out = nn.Linear(15, N_ACTIONS) 
-        self.out.weight.data.normal_(0,0.1) 
 
-    def forward(self, x):
-        x = self.fc1(x) 
-        x = F.relu(x)  # activation 
-        x = self.fc2(x) 
-        x = F.relu(x)  # activation 
-        actions_value = self.out(x) 
-        return actions_value
-
-
-
-class DQN():
+class DQNnet():
+    """ A DQN net loaded with pre-trained model """    
     def __init__(self, model_name):
         self.eval_net = torch.load(model_name)
 
@@ -67,8 +50,7 @@ def mtest(objects, file_name):
     if type(obstacle_ls[0]) == type(()):  # if there is only one obstacle:
         obstacle_ls = [obstacle_ls]
     env = CartEnv(s_start, s_goal, obstacle_ls) 
-    dqn = DQN(file_name)
-    if_astar = False
+    dqn = DQNnet(file_name)
     events =np.array([0,0,0,0,0])  # record the events during training: [bound, crash, deviate, reach]
     events_history = events.copy()
     episode_events = np.array([0,0,0,0,0]) # record the events during each episode
@@ -88,9 +70,10 @@ def mtest(objects, file_name):
 
             ep_r += r 
             if done: 
-                events[info-1] += 1 if not if_astar else 0  # update the event records when it runs on its own.
-                if info == 1 and if_astar == False:
-                    print('================================ Good =================================')
+                print('Episode information number: ', info)
+                events[info-1] += 1  # update the event records
+                if info == 1:
+                    print('================================ Path Found =================================')
                     print(' Episode: {0} | Reward: {1} | time: {2} sec'.format(
                         i_episode,round(ep_r,2), int(time.time()- start_time)))
                     # plt.pause(1)
@@ -112,7 +95,7 @@ def mtest(objects, file_name):
     plt.ylim((0,1))
     plt.grid(True)
     plt.title('AVERAGE ACCURACY: {0}'.format(np.average(accuracy_history)))
-    plt.savefig('Tested_result')
+    # plt.savefig('Tested_result')
 
     print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))

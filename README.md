@@ -8,7 +8,7 @@
 * Show the result at every 100 episodes 
 * Save the neural network so that it can be reloaded without training
 * Trainning results in 10000: 
-![RL_results](RL_results.jpg)
+![RL_results](RL_results.png)
 
 # RL model test 
 * Run the RLmodel_test.py 
@@ -21,8 +21,6 @@
 * `reward function:` The closer to the target, the greater reward each step will get. 
 * note: I tried to use AStar to teach it but the results seems not to be so good. 
 
-# RL_Weibo Folder
-* Run run_RL.py 
-* A RL reinforcement training with Polytope
+# Others:
 * Contributed by Weibo Huang 
 * Reference: MorvanZhou
