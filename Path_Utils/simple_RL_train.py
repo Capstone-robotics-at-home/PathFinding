@@ -10,7 +10,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np  
 import matplotlib.pyplot as plt 
-from Path_Utils.simple_RL_env import CartEnv 
+from simple_RL_env import CartEnv 
+from numpy import average
 # from Testing import realtime_search
 import time 
 
@@ -101,7 +102,7 @@ class DQN():
         loss.backward() 
         self.optimizer.step()
 
-def main(objects):
+def train(objects):
     plt.ion()
     obstacle_ls = objects['Obstacle']
     s_start = objects['Jetbot'][0]
@@ -113,7 +114,7 @@ def main(objects):
     events =np.array([0,0,0,0,0])  # record the events during training: [bound, crash, deviate, reach]
     events_history = events.copy()
     episode_events = np.array([0,0,0,0,0]) # record the events during each episode
-    accuracy_history = [0.0] # record the accuracy 
+    accuracy_history = [0.0] # record the accuracy
     N_shown = 100  # show results for N steps
 
     print("--------------------------------Finished initalizing------------------------")
@@ -133,33 +134,39 @@ def main(objects):
 
             ep_r += r 
             if done: 
+                print('\rTraining Episode now: %d, Event Number is: %d' % (i_episode,info), end = ' ')
                 events[info-1] += 1  # update the event records
                 if info == 1:
-                    print('\n================================ Good =================================')
-                    print(' Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
-                        i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
+                    print('\n================================ Good =================================\n')
+                    # print(' Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
+                    #     i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
                     # plt.pause(1)
                 # env.show_plot(astar_sol) 
                 break
 
             s = s_
+
+        if len(accuracy_history) >5:
+            if average(accuracy_history[-3:]) > 0.3:
+                break
         
         if i_episode % N_shown == 0:  # show the results in N_shown episode
             episode_events = events - events_history
             events_history = events.copy()
             accuracy = episode_events[0] / sum(episode_events)
-            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4}'.format(
                 episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
-            print('ACCURACY: {0}'.format(accuracy))
+            print('ACCURACY: {0}\n'.format(accuracy))
             accuracy_history.append(accuracy)
 
-            # # show the accuracy results
+            # show the results
             # plt.plot(accuracy_history[2:])
-            # plt.ylim((0,1))
+            # plt.ylim((0,0.6))
             # plt.grid(True)
             # plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
             #     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
-            plt.pause(0.5)
+            # plt.pause(0.5)
+            
     plt.ioff()
     plt.plot(accuracy_history[2:])
     plt.ylim((0,1))
@@ -169,20 +176,19 @@ def main(objects):
 
     print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
-    print('ACCURACY HISTORY: {0}'.format(accuracy_history))
-    torch.save(dqn.eval_net, 'DQNnet_{0}.pkl'.format(round(accuracy_history[-1],2)))
+    print('LAST ACCURACY: {0}'.format(round(accuracy_history[-1],2)))
+    torch.save(dqn.eval_net, 'DQNnet.pkl')
     plt.show()
 
 
 
 
 if __name__ == '__main__':
-    objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
-                'Obstacle': [(508, 223), 465, 551, 293, 153], 
-                # 'Obstacle': [(0,0), 0,1,0,1],
-                'Target': [(780, 364), 756, 804, 412, 316], 
-                'Grabber': [(214, 191), 186, 242, 232, 150]}
-    main(objects)
+    objects =  {'Jetbot': [(126, 403), 100, 153, 435, 372], 
+                'Obstacle': [(279, 386), 224, 334, 437, 335], 
+                'Target': [(385, 188), 352, 418, 224, 152], 
+                'Grabber': [(158, 407), 140, 177, 436, 378]}
+    train(objects)
 
 
 

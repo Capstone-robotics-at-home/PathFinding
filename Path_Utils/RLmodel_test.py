@@ -11,7 +11,7 @@ import torch.nn.functional as F
 import numpy as np  
 import matplotlib.pyplot as plt 
 from Path_Utils.simple_RL_env import CartEnv
-from Path_Utils.simple_RL_run import Net
+from Path_Utils.simple_RL_train import Net
 import time 
 
 # Hyper Parameters
@@ -58,7 +58,7 @@ def mtest(objects, file_name):
 
 
     print("--------------------------------Finished initalizing------------------------")
-    start_time = time.time()
+    # start_time = time.time()
     for i_episode in range(N_EPISODES):
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
@@ -70,12 +70,12 @@ def mtest(objects, file_name):
 
             ep_r += r 
             if done: 
-                print('Episode information number: ', info)
                 events[info-1] += 1  # update the event records
-                if info == 1:
-                    print('================================ Path Found =================================')
-                    print(' Episode: {0} | Reward: {1} | time: {2} sec'.format(
-                        i_episode,round(ep_r,2), int(time.time()- start_time)))
+                print('\r Testing Episode: {0}, Event information is: {1}'.format(i_episode,info), end = ' ')
+                # if info == 1:
+                #     print('================================ Path Found =================================')
+                    # print(' Episode: {0} | Reward: {1} | time: {2} sec'.format(
+                    #     i_episode,round(ep_r,2), int(time.time()- start_time)))
                     # plt.pause(1)
                 # env.show_plot([]) 
                 break
@@ -86,9 +86,9 @@ def mtest(objects, file_name):
             episode_events = events - events_history
             events_history = events.copy()
             accuracy = episode_events[0] / sum(episode_events)
-            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
+            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4}'.format(
                 episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
-            print('ACCURACY: {0}'.format(accuracy))
+            print('ACCURACY: {0}\n'.format(accuracy))
             accuracy_history.append(accuracy)
     accuracy_history = accuracy_history[2:]
     plt.plot(accuracy_history)
@@ -106,15 +106,11 @@ def mtest(objects, file_name):
 
 
 if __name__ == '__main__':
-    # objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
-    #             'Obstacle': [(508, 223), 465, 551, 293, 153], 
-    #             # 'Obstacle': [(0,0), 0,1,0,1],
-    #             'Target': [(780, 364), 756, 804, 412, 316], 
-    #             'Grabber': [(214, 191), 186, 242, 232, 150]}
-    objects = {'Jetbot': [(211, 169), 153, 270, 265, 74], 
-                'Obstacle': [(508, 186), 472, 544, 246, 126], 
-                'Target': [(758, 335), 733, 783, 383, 288], 
-                'Grabber': [(262, 223), 237, 288, 261, 185]}
+    objects = {'Jetbot': [(161, 146), 109, 213, 222, 70], 
+                'Obstacle': [(508, 223), 465, 551, 293, 153], 
+                # 'Obstacle': [(0,0), 0,1,0,1],
+                'Target': [(780, 364), 756, 804, 412, 316], 
+                'Grabber': [(214, 191), 186, 242, 232, 150]}
     mtest(objects, 'DQNnet.pkl')
 
 

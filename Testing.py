@@ -10,7 +10,7 @@ from Path_Utils.simple_RL_env import CartEnv
 from Path_Utils.JetbotPy import Decider
 from Path_Utils.Astar import Astar
 from Path_Utils import plotting
-from Path_Utils.simple_RL_run import Net
+from Path_Utils.simple_RL_train import Net
 
 
 Ratio = 1 
