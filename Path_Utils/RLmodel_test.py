@@ -3,7 +3,9 @@
  # @ Create Time: 2021-04-09 22:52:28
  # @ Description: A testing file for the accuracy of the pre-trained neural network.
  '''
-
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
 from math import pi
 import torch
 import torch.nn as nn

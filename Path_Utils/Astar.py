@@ -1,6 +1,9 @@
 import math
 import heapq
-from Path_Utils import env, plotting
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
+import env, plotting
 
 
 class Astar:

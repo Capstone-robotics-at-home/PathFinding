@@ -3,10 +3,12 @@
  # @ Create Time: 2021-03-31 16:11:18
  # @ Description: A simple Reinforcement Learning Environment for DQN
  '''
-
-from Path_Utils.JetbotPy import Decider
-from Path_Utils.Astar import Astar
-from Path_Utils import plotting
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
+from JetbotPy import Decider
+from Astar import Astar
+import plotting
 
 
 
@@ -22,10 +24,9 @@ class CartEnv():
         self.REWARD_REACH = 100
         self.REWARD_BOUND = -10
         self.REWARD_CRASH = -10
-        self.REWARD_DEVIATION = -10
-        self.REWARD_MISSING = -10
+        self.REWARD_OVERRUN = -10
         self.MAX_STEPS = 100
-        self.BOUNDS = [1200, 800]
+        self.BOUNDS = [800,800]
         self.TOTAL_DISTANCE = self.count_distance()  # the Original distance between goal and start 
 
     def step(self, action):
@@ -38,8 +39,7 @@ class CartEnv():
             1: Reach the goal 
             2: Go to the boundary
             3: Crash in the obstacle 
-            4: Deviate from the ideal path
-            5: Too many steps, missing 
+            4: Too many steps, overrun 
         """
         current_distance = self.count_distance() # the current distance between goal and start
         if action == 0:
@@ -81,18 +81,11 @@ class CartEnv():
             info = 3
             return next_state, reward, done, info 
 
-        if self.check_deviation() == True:
-            done = True
-            # print('Deviate from Ideal path')
-            reward = self.REWARD_DEVIATION
-            info = 4
-            return next_state, reward, done, info 
-
         if len(self.decider.visited) > self.MAX_STEPS:
             done = True
-            # print('Too many steps')
-            reward = self.REWARD_MISSING
-            info = 5
+            # print('Overrun')
+            reward = self.REWARD_OVERRUN
+            info = 4
             return next_state, reward, done, info
 
         return next_state, reward, done, info 
@@ -126,11 +119,6 @@ class CartEnv():
             return True
         else:
             return False
-    
-    def check_deviation(self): 
-        """ check if the current distance is longer than original """
-        distance = self.count_distance() 
-        return True if distance > self.TOTAL_DISTANCE + 100 else False
 
     def count_distance(self):
         """ Get the distance from the jetbot to target """

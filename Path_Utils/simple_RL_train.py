@@ -3,7 +3,9 @@
  # @ Create Time: 2021-03-31 16:11:45
  # @ Description: A Reinforcement Training program using simple Reinforcement learning environment.
  '''
-
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
 from math import pi
 import torch
 import torch.nn as nn
@@ -18,9 +20,11 @@ import time
 
 # Hyper Parameters
 N_EPISODES = 3000            # Number of total episodes
+N_SHOWN = 50  # show results for N steps
+
 BATCH_SIZE = 32
 LR = 0.01                   # learning rate
-EPSILON = 0.9              # greedy policy
+EPSILON = 0.85              # greedy policy
 GAMMA = 0.99               # reward discount, the larger, the longer sight. 
 TARGET_REPLACE_ITER = 50   # target update frequency
 MEMORY_CAPACITY = 100
@@ -28,6 +32,7 @@ MEMORY_CAPACITY = 100
 N_ACTIONS = 3
 N_STATES = 5
 ENV_A_SHAPE = 0
+DESIRED_ACCURACY = 0.3
 
 
 class Net(nn.Module):
@@ -111,14 +116,13 @@ def train(objects):
         obstacle_ls = [obstacle_ls]
     env = CartEnv(s_start, s_goal, obstacle_ls) 
     dqn = DQN()
-    events =np.array([0,0,0,0,0])  # record the events during training: [bound, crash, deviate, reach]
+    events =np.array([0,0,0,0])  # record the events during training: [reach, bound, crash, overgone]
     events_history = events.copy()
-    episode_events = np.array([0,0,0,0,0]) # record the events during each episode
+    episode_events = np.array([0,0,0,0]) # record the events during each episode
     accuracy_history = [0.0] # record the accuracy
-    N_shown = 100  # show results for N steps
 
     print("--------------------------------Finished initalizing------------------------")
-    start_time = time.time()
+    # start_time = time.time()
     for i_episode in range(N_EPISODES):
         s = env.reset(objects['Jetbot'][0],objects['Grabber'][0])
         ep_r = 0 
@@ -133,29 +137,26 @@ def train(objects):
 
 
             ep_r += r 
-            if done: 
+            if done:  # info = 1~5, 1 means having reached the goal 
                 print('\rTraining Episode now: %d, Event Number is: %d' % (i_episode,info), end = ' ')
                 events[info-1] += 1  # update the event records
-                if info == 1:
-                    print('\n================================ Good =================================\n')
-                    # print(' Episode: {0} | Reward: {1} | Step: {2} | Memory: {3} | time: {4} sec'.format(
-                    #     i_episode,round(ep_r,2), step, dqn.memory_counter, int(time.time()- start_time)))
-                    # plt.pause(1)
-                # env.show_plot(astar_sol) 
+                # plt.cla()
+                # env.show_plot([]) 
+                # plt.pause(0.001)
                 break
-
+ 
             s = s_
 
-        if len(accuracy_history) >5:
-            if average(accuracy_history[-3:]) > 0.3:
+        if len(accuracy_history) >7:
+            if average(accuracy_history[-3:]) > DESIRED_ACCURACY:
                 break
         
-        if i_episode % N_shown == 0:  # show the results in N_shown episode
+        if i_episode % N_SHOWN == 0:  # show the results in N_shown episode
             episode_events = events - events_history
             events_history = events.copy()
             accuracy = episode_events[0] / sum(episode_events)
-            print('\n Results: Reached: {0} Obstacle: {1}, Crashed: {2}, Deviation: {3}, Missing: {4}'.format(
-                episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
+            print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Overrun: {3}'.format(
+                episode_events[0], episode_events[1], episode_events[2], episode_events[3]))
             print('ACCURACY: {0}\n'.format(accuracy))
             accuracy_history.append(accuracy)
 
@@ -163,8 +164,8 @@ def train(objects):
             # plt.plot(accuracy_history[2:])
             # plt.ylim((0,0.6))
             # plt.grid(True)
-            # plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
-            #     episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]) + 'Accuracy: {0}'.format(accuracy))
+            # plt.title('Results: Reached: {0} Boundary: {1}, Crashed: {2}, Overrun{3} \n'.format(
+            #     episode_events[0], episode_events[1], episode_events[2], episode_events[3]) + 'Accuracy: {0}'.format(accuracy))
             # plt.pause(0.5)
             
     plt.ioff()
@@ -174,8 +175,8 @@ def train(objects):
     plt.title('RL_results.jpg')
     # plt.savefig('RL_results_{0}.jpg'.format((round(accuracy_history[-1],2))))
 
-    print('\n Results: Reached: {0} Boundary: {1}, Crashed: {2}, Deviation: {3}, Missing: {4} \n'.format(
-    episode_events[0], episode_events[1], episode_events[2], episode_events[3],episode_events[4]))
+    print('\nResults: Reached: {0} Boundary: {1}, Crashed: {2}, Overrun: {3}\n'.format(
+    episode_events[0], episode_events[1], episode_events[2], episode_events[3]))
     print('LAST ACCURACY: {0}'.format(round(accuracy_history[-1],2)))
     torch.save(dqn.eval_net, 'DQNnet.pkl')
     plt.show()
@@ -186,6 +187,7 @@ def train(objects):
 if __name__ == '__main__':
     objects =  {'Jetbot': [(126, 403), 100, 153, 435, 372], 
                 'Obstacle': [(279, 386), 224, 334, 437, 335], 
+                # 'Obstacle': [(1,1), 1,1,1,1], 
                 'Target': [(385, 188), 352, 418, 224, 152], 
                 'Grabber': [(158, 407), 140, 177, 436, 378]}
     train(objects)

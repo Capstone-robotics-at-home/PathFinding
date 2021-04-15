@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
-from Path_Utils import env
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
+import env
 from PIL import ImageDraw
 from math import sin, cos
 
