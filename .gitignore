@@ -2,3 +2,4 @@ tempCodeRunnerFile.py
 Path_Utils/__pycache__/plotting.cpython-37.pyc
 Path_Utils/__pycache__/env.cpython-37.pyc
 *.pyc
+DQNModels/*

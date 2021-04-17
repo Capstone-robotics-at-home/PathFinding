@@ -32,7 +32,7 @@ MEMORY_CAPACITY = 100
 N_ACTIONS = 3
 N_STATES = 5
 ENV_A_SHAPE = 0
-DESIRED_ACCURACY = 0.3
+DESIRED_ACCURACY = 0.6
 
 
 class Net(nn.Module):
@@ -147,8 +147,8 @@ def train(objects):
  
             s = s_
 
-        if len(accuracy_history) >7:
-            if average(accuracy_history[-3:]) > DESIRED_ACCURACY:
+        if len(accuracy_history) >5:
+            if accuracy_history[-1] > DESIRED_ACCURACY:
                 break
         
         if i_episode % N_SHOWN == 0:  # show the results in N_shown episode
@@ -185,11 +185,10 @@ def train(objects):
 
 
 if __name__ == '__main__':
-    objects =  {'Jetbot': [(126, 403), 100, 153, 435, 372], 
-                'Obstacle': [(279, 386), 224, 334, 437, 335], 
-                # 'Obstacle': [(1,1), 1,1,1,1], 
-                'Target': [(385, 188), 352, 418, 224, 152], 
-                'Grabber': [(158, 407), 140, 177, 436, 378]}
+    objects = {'Jetbot': [(126, 403), 99, 154, 436, 371], 
+                'Obstacle': [(282, 280), 226, 339, 322, 238], 
+                'Target': [(385, 189), 356, 415, 224, 154], 
+                'Grabber': [(158, 406), 139, 177, 437, 376]}
     train(objects)
 
 

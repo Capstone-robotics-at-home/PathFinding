@@ -3,9 +3,12 @@
  # @ Author: Zion Deng
  # @ Description: Run RL in real-time: train, load and predict 
  '''
-from Path_Utils.simple_RL_env import CartEnv
-from Path_Utils.simple_RL_train import Net,train
-from Path_Utils.RLmodel_test import mtest,DQNnet 
+import os,sys 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) +
+                "/Path_Utils")
+from simple_RL_env import CartEnv
+from simple_RL_train import Net,train
+from RLmodel_test import mtest,DQNnet 
 
 
 def RL_search(objects):

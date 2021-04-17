@@ -6,11 +6,11 @@
 
 from matplotlib import pyplot as plt
 from RLmodel_test import DQNnet
-from Path_Utils.simple_RL_env import CartEnv
-from Path_Utils.JetbotPy import Decider
-from Path_Utils.Astar import Astar
-from Path_Utils import plotting
-from Path_Utils.simple_RL_train import Net
+from simple_RL_env import CartEnv
+from JetbotPy import Decider
+from Astar import Astar
+import plotting
+from simple_RL_train import Net
 
 
 Ratio = 1 

@@ -1,25 +1,19 @@
-"# PathFinding" 
-# Before Running simple_RL_run.py:
-* Run _Astar.py: Using AStar algorithm to find the best way to get to the target and avoid obstacles
-* Run _Testing.py: Simulate how the Jetbot reacts according to the AStar solutions. 
-
+REPO FOR PATH_FINDING ALGORITHM
+================================================================
+A* and Reinforcement Learning
+----------------------------------------------------------------
 # Simple_RL: 
-* simple_RL_run.py: Train the DQN in the simple_RL_env 
-* Show the result at every 100 episodes 
+* run simple_RL_train.py: Train the DQN in the simple_RL_env  
 * Save the neural network so that it can be reloaded without training
-* Trainning results in 10000: 
-![RL_results](RL_results.png)
+* If the results are not ideal, try test it more times. The network might fall into overfitting or the accuracy just doesn't go up. 
 
-# RL model test 
-* Run the RLmodel_test.py 
-* Test the RL model in 1000 episodes. 
-* Show the average result along with the results at every 100 episodes 
-![model test](Tested_result.png)
+# Something in the Path_Utils folder:
+* Run Astar.py: Using AStar algorithm to find the best way to get to the target and avoid obstacles
+* Run Testing.py: Simulate how the Jetbot reacts according to the AStar solutions. 
 
 # Improvement in this RL environment:
 * `States:` expand 3 into 5 -> take the relative position to the target into account 
-* `reward function:` The closer to the target, the greater reward each step will get. 
-* note: I tried to use AStar to teach it but the results seems not to be so good. 
+* note: I tried to use AStar to teach it but the results seems not to be so good. Also, I tried to use different reward function, the results are not so good either.
 
 # Others:
 * Contributed by Weibo Huang 
