@@ -55,6 +55,12 @@ class Decider():
         if self.if_write: 
             self.send_cmd()
 
+    def step_delta(self,delta):
+        dx, dy = delta[0], delta[1]
+        x, y = self.position
+        self.position = [x+dx, y+dy]
+        self.visited.append([x,y,self.heading])
+
     def send_cmd(self):
         ''' A tool to transmit cmd line to jetbot
         warning: the counting is the mirror of the real world pic -> left right inverse '''

@@ -32,7 +32,7 @@ MEMORY_CAPACITY = 100
 N_ACTIONS = 3
 N_STATES = 5
 ENV_A_SHAPE = 0
-DESIRED_ACCURACY = 0.6
+DESIRED_ACCURACY = 0.3   # the desired accuracy of training results
 
 
 class Net(nn.Module):
@@ -114,7 +114,9 @@ def train(objects):
     s_goal = objects['Target'][0]
     if type(obstacle_ls[0]) == type(()):  # if there is only one obstacle:
         obstacle_ls = [obstacle_ls]
-    env = CartEnv(s_start, s_goal, obstacle_ls) 
+    jetbot_size = objects['Jetbot'][-4:] 
+    Ratio = 0.5
+    env = CartEnv(s_start, s_goal, obstacle_ls, jetbot_size, Ratio) 
     dqn = DQN()
     events =np.array([0,0,0,0])  # record the events during training: [reach, bound, crash, overgone]
     events_history = events.copy()
@@ -140,9 +142,9 @@ def train(objects):
             if done:  # info = 1~5, 1 means having reached the goal 
                 print('\rTraining Episode now: %d, Event Number is: %d' % (i_episode,info), end = ' ')
                 events[info-1] += 1  # update the event records
-                # plt.cla()
-                # env.show_plot([]) 
-                # plt.pause(0.001)
+                plt.cla()
+                env.show_plot([]) 
+                plt.pause(0.1)
                 break
  
             s = s_
@@ -185,10 +187,11 @@ def train(objects):
 
 
 if __name__ == '__main__':
-    objects = {'Jetbot': [(126, 403), 99, 154, 436, 371], 
-                'Obstacle': [(282, 280), 226, 339, 322, 238], 
-                'Target': [(385, 189), 356, 415, 224, 154], 
-                'Grabber': [(158, 406), 139, 177, 437, 376]}
+    # objects = {'Jetbot': [(126, 403), 99, 154, 436, 371], 
+    #             'Obstacle': [(282, 280), 226, 339, 322, 238], 
+    #             'Target': [(385, 189), 356, 415, 224, 154], 
+    #             'Grabber': [(158, 406), 139, 177, 437, 376]}
+    objects = {'Jetbot': [(235, 413), 189, 282, 460, 367], 'Obstacle': [(424, 252), 350, 499, 303, 202], 'Target': [(615, 145), 580, 650, 199, 91], 'Grabber': [(278, 412), 256, 301, 439, 386]}
     train(objects)
 
 

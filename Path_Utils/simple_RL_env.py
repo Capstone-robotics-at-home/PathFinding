@@ -13,10 +13,10 @@ import plotting
 
 
 class CartEnv():
-    def __init__(self, start, goal, obs):
+    def __init__(self, start, goal, obs, bot_size, ratio):
         self.decider = Decider()
         self.decider.reinit(start, goal)
-        self.astar = Astar(start, goal, obs)
+        self.astar = Astar(start, goal, obs, bot_size, ratio)
         self.plot = plotting.Plotting(start, goal, obs)
         # self.astar_sol = self.astar.searching()[0]
 
@@ -26,7 +26,7 @@ class CartEnv():
         self.REWARD_CRASH = -10
         self.REWARD_OVERRUN = -10
         self.MAX_STEPS = 100
-        self.BOUNDS = [800,800]
+        self.BOUNDS = [1000,800]  # tune according to the environment
         self.TOTAL_DISTANCE = self.count_distance()  # the Original distance between goal and start 
 
     def step(self, action):

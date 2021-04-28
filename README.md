@@ -1,7 +1,7 @@
-REPO FOR PATH_FINDING ALGORITHM
-================================================================
-A* and Reinforcement Learning
-----------------------------------------------------------------
+/**
+ * @ Author: Zion Deng
+ * @ Description:REPO FOR PATH_FINDING ALGORITHM,A* and Reinforcement Learning
+ */
 # Simple_RL: 
 * run simple_RL_train.py: Train the DQN in the simple_RL_env  
 * Save the neural network so that it can be reloaded without training
